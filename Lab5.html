@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 5 - NBA Player Stats Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background-color: #f4f4f4;
+            color: #222;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+        }
+
+        input, select, button {
+            padding: 8px;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #eaeaea;
+            cursor: pointer;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dark-mode {
+            background-color: #1e1e1e;
+            color: white;
+        }
+
+        .dark-mode table {
+            background-color: #2a2a2a;
+            color: white;
+        }
+
+        .dark-mode th {
+            background-color: #444;
+        }
+
+        .dark-mode td {
+            border-color: #555;
+        }
+
+        .dark-mode tr:hover {
+            background-color: #333;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+        }
+
+        .dark-mode .highlight {
+            background-color: #665c00;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <h1>NBA Player Stats Dashboard</h1>
+        <button id="darkModeBtn">Toggle Dark Mode</button>
+    </div>
+
+    <div class="controls">
+        <input type="text" id="searchInput" placeholder="Search players...">
+
+        <select id="teamFilter">
+            <option value="All">All</option>
+            <option value="PHI">PHI</option>
+            <option value="NYK">NYK</option>
+            <option value="OKC">OKC</option>
+            <option value="CLE">CLE</option>
+        </select>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th data-key="name">Name</th>
+                <th data-key="team">Team</th>
+                <th data-key="points">Points</th>
+                <th data-key="rebounds">Rebounds</th>
+                <th data-key="assists">Assists</th>
+            </tr>
+        </thead>
+        <tbody id="playerTableBody"></tbody>
+    </table>
+
+    <script>
+        const players = [
+            { name: "Joel Embiid", team: "PHI", points: 33.0, rebounds: 10.8, assists: 5.7 },
+            { name: "Jalen Brunson", team: "NYK", points: 32.4, rebounds: 3.3, assists: 7.5 },
+            { name: "Shai Gilgeous-Alexander", team: "OKC", points: 30.2, rebounds: 7.2, assists: 6.4 },
+            { name: "Tyrese Maxey", team: "PHI", points: 29.8, rebounds: 5.2, assists: 6.8 },
+            { name: "Donovan Mitchell", team: "CLE", points: 29.6, rebounds: 5.4, assists: 4.7 }
+        ];
+
+        const tableBody = document.getElementById("playerTableBody");
+        const searchInput = document.getElementById("searchInput");
+        const teamFilter = document.getElementById("teamFilter");
+        const darkModeBtn = document.getElementById("darkModeBtn");
+        const headers = document.querySelectorAll("th");
+
+        let currentPlayers = [...players];
+        let sortDirection = 1;
+
+        function displayPlayers(playerList) {
+            tableBody.innerHTML = "";
+
+            playerList.forEach(player => {
+                const row = document.createElement("tr");
+
+                const nameCell = document.createElement("td");
+                nameCell.textContent = player.name;
+
+                const teamCell = document.createElement("td");
+                teamCell.textContent = player.team;
+
+                const pointsCell = document.createElement("td");
+                pointsCell.textContent = player.points;
+
+                const reboundsCell = document.createElement("td");
+                reboundsCell.textContent = player.rebounds;
+
+                const assistsCell = document.createElement("td");
+                assistsCell.textContent = player.assists;
+
+                row.appendChild(nameCell);
+                row.appendChild(teamCell);
+                row.appendChild(pointsCell);
+                row.appendChild(reboundsCell);
+                row.appendChild(assistsCell);
+
+                row.addEventListener("mouseover", function () {
+                    row.classList.add("highlight");
+                });
+
+                row.addEventListener("mouseout", function () {
+                    row.classList.remove("highlight");
+                });
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        function filterPlayers() {
+            const searchValue = searchInput.value.toLowerCase();
+            const selectedTeam = teamFilter.value;
+
+            currentPlayers = players.filter(player => {
+                const matchesSearch = player.name.toLowerCase().includes(searchValue);
+                const matchesTeam = selectedTeam === "All" || player.team === selectedTeam;
+                return matchesSearch && matchesTeam;
+            });
+
+            displayPlayers(currentPlayers);
+        }
+
+        searchInput.addEventListener("input", filterPlayers);
+        teamFilter.addEventListener("change", filterPlayers);
+
+        darkModeBtn.addEventListener("click", function () {
+            document.body.classList.toggle("dark-mode");
+        });
+
+        headers.forEach(header => {
+            header.addEventListener("click", function () {
+                const key = header.getAttribute("data-key");
+
+                currentPlayers.sort((a, b) => {
+                    if (a[key] < b[key]) return -1 * sortDirection;
+                    if (a[key] > b[key]) return 1 * sortDirection;
+                    return 0;
+                });
+
+                sortDirection *= -1;
+                displayPlayers(currentPlayers);
+            });
+        });
+
+        displayPlayers(players);
+    </script>
+
+</body>
+</html>
