@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Country Search App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="top-header">
+    <nav>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        <a href="assignment1.html">Home</a>
+        <a href="schedule.html">Class Schedule</a>
+        <a href="contact.html">Contact</a>
+        <a href="myworks.html">My Works</a>
+    </nav>
+</header>
+
+<div class="container">
+
+    <aside class="sidebar">
+        <img src="images/profile.jpg" class="profile-img">
+        <h2>Lina Mohammed</h2>
+        <p>IT Student</p>
+
+        <div class="contact-info">
+            <p><a href="myworks.html">Back to My Works</a></p>
+            <p><a href="app1.html">View App 1</a></p>
+        </div>
+    </aside>
+
+    <main class="content">
+        <h1>Country Search App</h1>
+
+        <p>Search for a country and view basic information using a public API.</p>
+
+        <div class="search-box">
+            <input type="text" id="countryInput" placeholder="Enter country name">
+            <button onclick="searchCountry()">Search</button>
+        </div>
+
+        <p id="message"></p>
+
+        <div id="countryResults" class="country-grid"></div>
+    </main>
+
+</div>
+
+<footer>
+    <p>© 2025 Lina Mohammed</p>
+</footer>
+
+<script>
+function searchCountry() {
+    let countryName = document.getElementById("countryInput").value.trim();
+    let message = document.getElementById("message");
+    let results = document.getElementById("countryResults");
+
+    results.innerHTML = "";
+
+    if (countryName === "") {
+        message.innerText = "Please enter a country name.";
+        return;
+    }
+
+    message.innerText = "Loading...";
+
+    fetch("https://restcountries.com/v3.1/name/" + countryName)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Country not found");
+            }
+            return response.json();
+        })
+        .then(data => {
+            message.innerText = data.length + " result(s) found.";
+
+            data.forEach(country => {
+                let name = country.name.common;
+                let flag = country.flags.png;
+                let capital = country.capital ? country.capital[0] : "No capital";
+                let region = country.region;
+                let population = country.population.toLocaleString();
+
+                let card = document.createElement("div");
+                card.className = "country-card";
+
+                card.innerHTML = `
+                    <img src="${flag}" alt="${name} flag">
+                    <h2>${name}</h2>
+                    <p><strong>Capital:</strong> ${capital}</p>
+                    <p><strong>Region:</strong> ${region}</p>
+                    <p><strong>Population:</strong> ${population}</p>
+                `;
+
+                results.appendChild(card);
+            });
+        })
+        .catch(error => {
+            message.innerText = "No country found. Try another name.";
+        });
+}
+</script>
+
+</body>
+</html>
